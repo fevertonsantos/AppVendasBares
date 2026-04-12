@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="fragments/layout :: head('Pedidos')">
+<body>
+  <div th:replace="fragments/layout :: content">
+    <h1>Pedidos</h1>
+    <table>
+      <tr><th>ID</th><th>Cliente</th><th>Total</th></tr>
+      <tr th:each="o : ${orders}">
+        <td th:text="${o.id}">1</td>
+        <td th:text="${o.cliente}">Cliente</td>
+        <td th:text="${o.total}">0.00</td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
