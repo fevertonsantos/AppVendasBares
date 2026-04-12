@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pedido_item")
@@ -42,4 +44,7 @@ public class PedidoItem {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
+
+    @OneToMany(mappedBy = "pedidoItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PedidoItemAdicional> adicionais = new ArrayList<>();
 }

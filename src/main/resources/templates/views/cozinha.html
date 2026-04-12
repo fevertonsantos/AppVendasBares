@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Produção</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; color: white; }
+        .topo { background: #0f3460; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .topo h1 { font-size: 20px; }
+        .setor-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; background: #16213e; }
+        .setor-tab { padding: 8px 20px; border-radius: 20px; border: 2px solid #0f3460; background: transparent; color: #aaa; cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; }
+        .setor-tab.active { background: #0f3460; color: white; }
+        .container { padding: 20px; }
+        .stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-card { background: #16213e; border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 120px; text-align: center; }
+        .stat-card .number { font-size: 28px; font-weight: 700; }
+        .stat-card .label { font-size: 12px; color: #aaa; margin-top: 4px; }
+        .stat-card.fila .number { color: #f39c12; }
+        .stat-card.preparo .number { color: #3498db; }
+        .stat-card.pronto .number { color: #27ae60; }
+        .stat-card.atrasado .number { color: #e74c3c; }
+        .fila-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        .pedido-card { background: #16213e; border-radius: 12px; padding: 16px; border-left: 4px solid #f39c12; }
+        .pedido-card.em-preparo { border-left-color: #3498db; }
+        .pedido-card.pronto { border-left-color: #27ae60; }
+        .pedido-card .header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .pedido-card .produto { font-size: 16px; font-weight: 600; }
+        .pedido-card .mesa { color: #aaa; font-size: 13px; }
+        .pedido-card .obs { color: #f39c12; font-size: 12px; margin-top: 4px; font-style: italic; }
+        .pedido-card .qty { background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 10px; font-size: 13px; }
+        .pedido-card .actions { margin-top: 10px; display: flex; gap: 8px; }
+        .pedido-card .actions button { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-preparo { background: #3498db; color: white; }
+        .btn-pronto { background: #27ae60; color: white; }
+        .btn-entregar { background: #9b59b6; color: white; }
+        .empty-msg { text-align: center; color: #666; padding: 40px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="topo">
+        <h1>Painel de Produção</h1>
+        <span style="color:#aaa; font-size:14px;" id="clock"></span>
+    </div>
+
+    <div class="setor-tabs" id="setorTabs">
+        <button th:each="setor : ${setores}" class="setor-tab"
+                th:text="${setor}" th:data-setor="${setor}"
+                onclick="selectSetor(this)"></button>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card fila"><div class="number" id="statFila">0</div><div class="label">Em Fila</div></div>
+            <div class="stat-card preparo"><div class="number" id="statPreparo">0</div><div class="label">Em Preparo</div></div>
+            <div class="stat-card pronto"><div class="number" id="statPronto">0</div><div class="label">Prontos</div></div>
+            <div class="stat-card atrasado"><div class="number" id="statAtrasado">0</div><div class="label">Atrasados</div></div>
+        </div>
+
+        <div id="filaContainer" class="fila-grid"></div>
+        <div id="emptyMsg" class="empty-msg" style="display:none;">Nenhum pedido neste setor</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/lib/stomp.min.js"></script>
+    <script th:inline="javascript">
+        const empresaId = [[${empresaId}]];
+        let currentSetor = null;
+        let stompClient = null;
+
+        // Auto-select first tab
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.setor-tab');
+            if (firstTab) { selectSetor(firstTab); }
+            updateClock();
+            setInterval(updateClock, 1000);
+            connectWebSocket();
+        });
+
+        function updateClock() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR');
+        }
+
+        function selectSetor(btn) {
+            document.querySelectorAll('.setor-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            currentSetor = btn.dataset.setor;
+            loadFila();
+        }
+
+        function loadFila() {
+            fetch(`/api/pedidos/fila/${empresaId}/${currentSetor}`)
+                .then(r => r.json())
+                .then(itens => renderFila(itens))
+                .catch(() => {});
+        }
+
+        function renderFila(itens) {
+            const container = document.getElementById('filaContainer');
+            const empty = document.getElementById('emptyMsg');
+
+            if (!itens || itens.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                updateStats(itens || []);
+                return;
+            }
+            empty.style.display = 'none';
+            updateStats(itens);
+
+            container.innerHTML = itens.map(item => {
+                const statusClass = item.status === 'EM_PREPARO' ? 'em-preparo' : item.status === 'PRONTO' ? 'pronto' : '';
+                return `
+                <div class="pedido-card ${statusClass}">
+                    <div class="header">
+                        <span class="produto">${item.produtoNome}</span>
+                        <span class="qty">${item.quantidade}x</span>
+                    </div>
+                    <div class="mesa">Status: ${item.status.replace('_', ' ')}</div>
+                    ${item.observacao ? `<div class="obs">Obs: ${item.observacao}</div>` : ''}
+                    <div class="actions">
+                        ${item.status === 'RECEBIDO' || item.status === 'EM_FILA' ? `<button class="btn-preparo" onclick="updateStatus(${item.id}, 'EM_PREPARO')">Iniciar Preparo</button>` : ''}
+                        ${item.status === 'EM_PREPARO' ? `<button class="btn-pronto" onclick="updateStatus(${item.id}, 'PRONTO')">Marcar Pronto</button>` : ''}
+                        ${item.status === 'PRONTO' ? `<button class="btn-entregar" onclick="updateStatus(${item.id}, 'ENTREGUE')">Entregar</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateStats(itens) {
+            document.getElementById('statFila').textContent = itens.filter(i => i.status === 'RECEBIDO' || i.status === 'EM_FILA').length;
+            document.getElementById('statPreparo').textContent = itens.filter(i => i.status === 'EM_PREPARO').length;
+            document.getElementById('statPronto').textContent = itens.filter(i => i.status === 'PRONTO').length;
+            document.getElementById('statAtrasado').textContent = 0;
+        }
+
+        function updateStatus(itemId, status) {
+            fetch(`/api/pedidos/item/${itemId}/status?status=${status}`, { method: 'PUT' })
+                .then(r => r.json())
+                .then(() => loadFila())
+                .catch(() => alert('Erro ao atualizar status'));
+        }
+
+        function connectWebSocket() {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+            stompClient.connect({}, () => {
+                stompClient.subscribe('/topic/pedidos/' + empresaId, () => {
+                    if (currentSetor) loadFila();
+                });
+            });
+        }
+    </script>
+</body>
+</html>

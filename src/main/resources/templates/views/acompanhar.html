@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acompanhar Pedido</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+        .topo { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; padding: 16px 20px; text-align: center; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 20px; }
+        .pedido-info { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
+        .pedido-info h2 { color: #1a1a2e; margin-bottom: 10px; font-size: 20px; }
+        .status-timeline { display: flex; justify-content: space-between; margin: 20px 0; position: relative; }
+        .status-timeline::before { content: ''; position: absolute; top: 15px; left: 10%; right: 10%; height: 3px; background: #ddd; z-index: 0; }
+        .status-step { text-align: center; position: relative; z-index: 1; flex: 1; }
+        .status-dot { width: 30px; height: 30px; border-radius: 50%; background: #ddd; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; }
+        .status-dot.active { background: #27ae60; }
+        .status-dot.current { background: #3498db; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        .status-label { font-size: 11px; color: #888; }
+        .itens-list { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .item-row { padding: 10px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .item-row:last-child { border-bottom: none; }
+        .item-name { font-weight: 600; color: #333; }
+        .item-obs { font-size: 12px; color: #888; font-style: italic; }
+        .item-status { padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .item-status.RECEBIDO, .item-status.EM_FILA { background: #fff3cd; color: #856404; }
+        .item-status.EM_PREPARO { background: #cce5ff; color: #004085; }
+        .item-status.PRONTO { background: #d4edda; color: #155724; }
+        .item-status.ENTREGUE { background: #e2e3e5; color: #383d41; }
+        .total-bar { background: white; border-radius: 14px; padding: 16px; margin-top: 16px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .total-bar .total { font-size: 24px; font-weight: 700; color: #0a7a2f; }
+        .btn-voltar { display: block; text-align: center; margin: 20px auto; padding: 12px 30px; background: #0f3460; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="topo"><h1>Acompanhar Pedido</h1></div>
+
+    <div class="container">
+        <div class="pedido-info">
+            <h2>Pedido #<span th:text="${pedido.id}">1</span></h2>
+            <p>Mesa: <strong th:text="${pedido.mesaNumero}">1</strong></p>
+            <p>Status: <strong id="pedidoStatus" th:text="${pedido.status}">RECEBIDO</strong></p>
+        </div>
+
+        <div class="status-timeline" id="timeline">
+            <div class="status-step" th:each="s : ${ {'RECEBIDO','EM_FILA','EM_PREPARO','PRONTO','ENTREGUE'} }">
+                <div class="status-dot" th:id="'dot-' + ${s}">&#10003;</div>
+                <div class="status-label" th:text="${s.replace('_', ' ')}">Status</div>
+            </div>
+        </div>
+
+        <div class="itens-list">
+            <div class="item-row" th:each="item : ${pedido.itens}">
+                <div>
+                    <div class="item-name"><span th:text="${item.quantidade}">1</span>x <span th:text="${item.produtoNome}">Produto</span></div>
+                    <div class="item-obs" th:if="${item.observacao != null}" th:text="'Obs: ' + ${item.observacao}"></div>
+                </div>
+                <div>
+                    <span class="item-status" th:classappend="${item.status}" th:text="${item.status.replace('_', ' ')}">Status</span>
+                    <div style="text-align:right; font-weight:600; color:#0a7a2f; margin-top:4px;">R$ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="total-bar">
+            Total: <span class="total">R$ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span></span>
+        </div>
+
+        <a th:href="'/comanda/' + ${pedido.mesaId}" class="btn-voltar">Ver Comanda da Mesa</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/lib/stomp.min.js"></script>
+    <script th:inline="javascript">
+        const pedidoId = [[${pedido.id}]];
+        const statusOrder = ['RECEBIDO', 'EM_FILA', 'EM_PREPARO', 'PRONTO', 'ENTREGUE', 'FECHADO'];
+
+        function updateTimeline(currentStatus) {
+            const idx = statusOrder.indexOf(currentStatus);
+            statusOrder.forEach((s, i) => {
+                const dot = document.getElementById('dot-' + s);
+                if (!dot) return;
+                dot.classList.remove('active', 'current');
+                if (i < idx) dot.classList.add('active');
+                else if (i === idx) dot.classList.add('current');
+            });
+            document.getElementById('pedidoStatus').textContent = currentStatus;
+        }
+
+        updateTimeline([[${pedido.status}]]);
+
+        // WebSocket for real-time updates
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+        stompClient.connect({}, () => {
+            stompClient.subscribe('/topic/pedido-status/' + pedidoId, (msg) => {
+                const data = JSON.parse(msg.body);
+                updateTimeline(data.status);
+                // Refresh page to update item statuses
+                setTimeout(() => location.reload(), 1000);
+            });
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => location.reload(), 30000);
+    </script>
+</body>
+</html>
