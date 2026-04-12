@@ -1,102 +1,76 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Dashboard Gerencial</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
-        .topo { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; padding: 16px 20px; }
-        .topo-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .topo h1 { font-size: 22px; }
-        .nav-links { display: flex; gap: 16px; }
-        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; padding: 6px 14px; border-radius: 8px; }
-        .nav-links a:hover { background: rgba(255,255,255,0.1); color: white; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .kpi-card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-        .kpi-card .label { font-size: 13px; color: #888; margin-bottom: 4px; }
-        .kpi-card .value { font-size: 26px; font-weight: 700; color: #1a1a2e; }
-        .kpi-card .value.green { color: #0a7a2f; }
-        .kpi-card .value.blue { color: #0f3460; }
-        .section { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
-        .section h2 { font-size: 18px; color: #1a1a2e; margin-bottom: 16px; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table th { text-align: left; padding: 10px 12px; background: #f8f9fa; color: #555; font-size: 13px; border-bottom: 2px solid #dee2e6; }
-        .table td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .table tr:hover { background: #f8f9fa; }
-        .rank { display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: #0f3460; color: white; text-align: center; line-height: 24px; font-size: 12px; font-weight: 600; }
-        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-        .mesa-card { padding: 16px; border-radius: 10px; text-align: center; font-weight: 600; }
-        .mesa-livre { background: #d4edda; color: #155724; }
-        .mesa-ocupada { background: #fff3cd; color: #856404; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
-    <div class="topo">
-        <div class="topo-inner">
-            <h1>Dashboard Gerencial</h1>
-            <div class="nav-links">
-                <a th:href="'/cozinha/' + ${empresaId}">Produção</a>
-                <a href="/login">Sair</a>
+    <div class="app-layout">
+        <div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+
+        <div class="app-content">
+            <div th:replace="~{fragments/header :: header('Dashboard Gerencial')}"></div>
+
+            <div class="content-wrapper">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Faturamento Diario</div>
+                        <div class="kpi-value green">R$ <span th:text="${#numbers.formatDecimal(dashboard.faturamentoDiario, 1, 2)}">0.00</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Faturamento Semanal</div>
+                        <div class="kpi-value green">R$ <span th:text="${#numbers.formatDecimal(dashboard.faturamentoSemanal, 1, 2)}">0.00</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Faturamento Mensal</div>
+                        <div class="kpi-value green">R$ <span th:text="${#numbers.formatDecimal(dashboard.faturamentoMensal, 1, 2)}">0.00</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Ticket Medio</div>
+                        <div class="kpi-value blue">R$ <span th:text="${#numbers.formatDecimal(dashboard.ticketMedio, 1, 2)}">0.00</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pedidos Hoje</div>
+                        <div class="kpi-value" th:text="${dashboard.totalPedidosHoje}">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Mesas Ocupadas</div>
+                        <div class="kpi-value yellow" th:text="${dashboard.mesasOcupadas}">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Mesas Livres</div>
+                        <div class="kpi-value green" th:text="${dashboard.mesasLivres}">0</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Produtos Mais Vendidos (Mes)</h2>
+                    <table class="data-table" th:if="${!#lists.isEmpty(dashboard.produtosMaisVendidos)}">
+                        <thead>
+                            <tr><th>#</th><th>Produto</th><th>Qtd Vendida</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p, stat : ${dashboard.produtosMaisVendidos}">
+                                <td><span class="rank" th:text="${stat.index + 1}">1</span></td>
+                                <td th:text="${p.nome}">Produto</td>
+                                <td th:text="${p.totalVendido}">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p th:if="${#lists.isEmpty(dashboard.produtosMaisVendidos)}" class="empty-msg">Nenhum dado disponivel.</p>
+                </div>
             </div>
+
+            <div th:replace="~{fragments/footer :: footer}"></div>
         </div>
     </div>
 
-    <div class="container">
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="label">Faturamento Diário</div>
-                <div class="value green">R$ <span th:text="${#numbers.formatDecimal(dashboard.faturamentoDiario, 1, 2)}">0.00</span></div>
-            </div>
-            <div class="kpi-card">
-                <div class="label">Faturamento Semanal</div>
-                <div class="value green">R$ <span th:text="${#numbers.formatDecimal(dashboard.faturamentoSemanal, 1, 2)}">0.00</span></div>
-            </div>
-            <div class="kpi-card">
-                <div class="label">Faturamento Mensal</div>
-                <div class="value green">R$ <span th:text="${#numbers.formatDecimal(dashboard.faturamentoMensal, 1, 2)}">0.00</span></div>
-            </div>
-            <div class="kpi-card">
-                <div class="label">Ticket Médio</div>
-                <div class="value blue">R$ <span th:text="${#numbers.formatDecimal(dashboard.ticketMedio, 1, 2)}">0.00</span></div>
-            </div>
-            <div class="kpi-card">
-                <div class="label">Pedidos Hoje</div>
-                <div class="value" th:text="${dashboard.totalPedidosHoje}">0</div>
-            </div>
-            <div class="kpi-card">
-                <div class="label">Mesas Ocupadas</div>
-                <div class="value" th:text="${dashboard.mesasOcupadas}">0</div>
-            </div>
-            <div class="kpi-card">
-                <div class="label">Mesas Livres</div>
-                <div class="value" th:text="${dashboard.mesasLivres}">0</div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Produtos Mais Vendidos (Mês)</h2>
-            <table class="table" th:if="${!#lists.isEmpty(dashboard.produtosMaisVendidos)}">
-                <thead>
-                    <tr><th>#</th><th>Produto</th><th>Qtd Vendida</th></tr>
-                </thead>
-                <tbody>
-                    <tr th:each="p, stat : ${dashboard.produtosMaisVendidos}">
-                        <td><span class="rank" th:text="${stat.index + 1}">1</span></td>
-                        <td th:text="${p.nome}">Produto</td>
-                        <td th:text="${p.totalVendido}">0</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p th:if="${#lists.isEmpty(dashboard.produtosMaisVendidos)}" style="color:#888;">Nenhum dado disponível.</p>
-        </div>
-    </div>
-
+    <script th:src="@{/js/app.js}"></script>
     <script>
-        // Auto-refresh every 60 seconds
-        setTimeout(() => location.reload(), 60000);
+        setTimeout(function() { location.reload(); }, 60000);
     </script>
 </body>
 </html>

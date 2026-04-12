@@ -1,72 +1,152 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Cadastro - AppVendasBares</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .register-container { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo h1 { font-size: 24px; color: #1a1a2e; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; font-size: 14px; }
-        .form-group input, .form-group select { width: 100%; padding: 11px 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #0f3460; }
-        .form-group small { color: #888; font-size: 12px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; background: #0f3460; color: white; }
-        .btn:hover { background: #1a1a2e; }
-        .links { text-align: center; margin-top: 16px; }
-        .links a { color: #0f3460; text-decoration: none; font-size: 14px; }
-        .error-msg { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
-        .success-msg { background: #efe; color: #060; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+        .register-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-color);
+        }
+        .register-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 440px;
+        }
+        .register-box .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .register-box .logo .icon {
+            width: 60px;
+            height: 60px;
+            background: var(--accent-color);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .register-box .logo h1 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .register-box .logo p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .register-box .btn-registrar {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent-color);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .register-box .btn-registrar:hover {
+            background: var(--accent-hover);
+        }
+        .register-box .links {
+            text-align: center;
+            margin-top: 16px;
+        }
+        .register-box .links a {
+            color: var(--accent-color);
+            font-size: 14px;
+        }
+        .register-error {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--red);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .register-success {
+            background: rgba(39, 174, 96, 0.15);
+            color: var(--green);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="register-container">
-        <div class="logo"><h1>Criar Conta</h1></div>
-        <div id="errorMsg" class="error-msg"></div>
-        <div id="successMsg" class="success-msg"></div>
+    <div class="register-page">
+        <div class="register-box">
+            <div class="logo">
+                <div class="icon">&#127860;</div>
+                <h1>Cadastro</h1>
+                <p>Crie sua conta no AppVendasBares</p>
+            </div>
 
-        <form id="regForm" onsubmit="return doRegistrar(event)">
-            <div class="form-group">
-                <label>Estabelecimento</label>
-                <select id="empresaId" required>
-                    <option value="">Selecione...</option>
-                    <option th:each="emp : ${empresas}" th:value="${emp.id}" th:text="${emp.nomeFantasia}"></option>
-                </select>
+            <div class="register-error" id="regError"></div>
+            <div class="register-success" id="regSuccess"></div>
+
+            <form id="regForm" onsubmit="doRegistrar(event)">
+                <div class="form-group">
+                    <label>Estabelecimento</label>
+                    <select id="empresaId" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="empresa : ${empresas}" th:value="${empresa.id}" th:text="${empresa.nomeFantasia}">Bar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="nome" placeholder="Seu nome completo" required/>
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" id="cpf" placeholder="000.000.000-00" required maxlength="14"/>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="email" placeholder="seu@email.com" required/>
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="text" id="telefone" placeholder="(00) 00000-0000"/>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="senha" placeholder="Minimo 6 caracteres" required minlength="6"/>
+                </div>
+                <button type="submit" class="btn-registrar">Cadastrar</button>
+            </form>
+
+            <div class="links">
+                <a th:href="@{/login}">Ja tem conta? Faca login</a>
             </div>
-            <div class="form-group">
-                <label>Nome completo</label>
-                <input type="text" id="nome" required>
-            </div>
-            <div class="form-group">
-                <label>CPF</label>
-                <input type="text" id="cpf" required placeholder="000.000.000-00" maxlength="14">
-            </div>
-            <div class="form-group">
-                <label>E-mail</label>
-                <input type="email" id="email" required>
-            </div>
-            <div class="form-group">
-                <label>Telefone</label>
-                <input type="text" id="telefone" placeholder="(11) 99999-9999">
-            </div>
-            <div class="form-group">
-                <label>Senha</label>
-                <input type="password" id="senha" required minlength="8">
-                <small>Mín. 8 caracteres, 1 maiúscula, 1 caractere especial</small>
-            </div>
-            <button type="submit" class="btn">Cadastrar</button>
-        </form>
-        <div class="links"><a href="/login">Já tenho conta</a></div>
+        </div>
     </div>
 
+    <script th:src="@{/js/app.js}"></script>
     <script>
         function doRegistrar(e) {
             e.preventDefault();
-            const body = {
+            var errorEl = document.getElementById('regError');
+            var successEl = document.getElementById('regSuccess');
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+
+            var data = {
                 empresaId: parseInt(document.getElementById('empresaId').value),
                 nome: document.getElementById('nome').value,
                 cpf: document.getElementById('cpf').value,
@@ -78,24 +158,23 @@
             fetch('/api/auth/registrar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                body: JSON.stringify(data)
             })
-            .then(r => r.json())
-            .then(data => {
-                if (data.erro) {
-                    document.getElementById('errorMsg').textContent = data.erro;
-                    document.getElementById('errorMsg').style.display = 'block';
+            .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(result) {
+                if (!result.ok) {
+                    errorEl.textContent = result.data.erro || 'Erro ao cadastrar';
+                    errorEl.style.display = 'block';
                 } else {
-                    document.getElementById('successMsg').textContent = 'Cadastro realizado! Faça login.';
-                    document.getElementById('successMsg').style.display = 'block';
-                    setTimeout(() => window.location.href = '/login', 2000);
+                    successEl.textContent = 'Cadastro realizado com sucesso! Redirecionando...';
+                    successEl.style.display = 'block';
+                    setTimeout(function() { window.location.href = '/login'; }, 2000);
                 }
             })
-            .catch(() => {
-                document.getElementById('errorMsg').textContent = 'Erro de conexão';
-                document.getElementById('errorMsg').style.display = 'block';
+            .catch(function() {
+                errorEl.textContent = 'Erro de conexao com o servidor';
+                errorEl.style.display = 'block';
             });
-            return false;
         }
     </script>
 </body>

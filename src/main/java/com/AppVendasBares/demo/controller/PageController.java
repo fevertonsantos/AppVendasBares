@@ -88,4 +88,10 @@ public class PageController {
         model.addAttribute("pedidos", pedidos);
         return "views/comanda";
     }
+
+    @GetMapping("/admin/selecionar-empresa")
+    public String selecionarEmpresaPage(Model model) {
+        model.addAttribute("empresas", empresaRepository.findAll());
+        return "views/selecionar-empresa";
+    }
 }

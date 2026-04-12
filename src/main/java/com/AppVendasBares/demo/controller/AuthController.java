@@ -88,4 +88,14 @@ public class AuthController {
                 "nome", session.getAttribute("nomeUsuario")
         ));
     }
+
+    @PostMapping("/selecionar-empresa/{empresaId}")
+    public ResponseEntity<?> selecionarEmpresa(@PathVariable Long empresaId, HttpSession session) {
+        Long usuarioId = (Long) session.getAttribute("usuarioId");
+        if (usuarioId == null) {
+            return ResponseEntity.status(401).body(Map.of("erro", "Não autenticado"));
+        }
+        session.setAttribute("empresaId", empresaId);
+        return ResponseEntity.ok(Map.of("mensagem", "Empresa selecionada", "empresaId", empresaId));
+    }
 }

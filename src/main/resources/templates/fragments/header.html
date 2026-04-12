@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="app-header" th:fragment="header(pageTitle)">
+    <div class="header-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">&#9776;</button>
+        <span class="page-title" th:text="${pageTitle}">Pagina</span>
+        <span id="clock" style="color: var(--text-muted); font-size: 13px;"></span>
+    </div>
+    <div class="header-right">
+        <button class="btn-chamar-garcom" onclick="chamarGarcom()"
+                th:if="${perfil == 'CLIENTE' or perfil == 'GARCOM'}">
+            &#128276; Chamar Garcom
+        </button>
+        <div class="user-info" th:if="${nomeUsuario != null}">
+            <span th:text="${nomeUsuario}">Usuario</span>
+            <span class="perfil-badge" th:text="${perfil}">PERFIL</span>
+        </div>
+        <button class="btn-logout" onclick="doLogout()" th:if="${nomeUsuario != null}">Sair</button>
+    </div>
+</header>
+</body>
+</html>
