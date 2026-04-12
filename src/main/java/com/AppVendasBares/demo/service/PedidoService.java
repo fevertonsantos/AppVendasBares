@@ -251,6 +251,7 @@ public class PedidoService {
 
         return new PedidoResponse(
                 pedido.getId(),
+                pedido.getEmpresa().getId(),
                 pedido.getMesa().getId(),
                 pedido.getMesa().getNumero(),
                 pedido.getUsuario() != null ? pedido.getUsuario().getNome() : null,
