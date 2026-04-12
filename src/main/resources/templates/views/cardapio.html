@@ -1,102 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Digital</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
-        .topo { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; padding: 16px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .topo-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .topo h1 { font-size: 22px; }
-        .mesa-badge { background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; font-size: 14px; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        .search-bar { margin-bottom: 16px; }
-        .search-bar input { width: 100%; padding: 12px 18px; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; }
-        .search-bar input:focus { outline: none; border-color: #0f3460; }
-        .categorias { display: flex; gap: 10px; overflow-x: auto; padding: 8px 0 16px; }
-        .cat-btn { padding: 8px 20px; border: 2px solid #0f3460; border-radius: 20px; background: white; color: #0f3460; cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 14px; transition: all 0.2s; }
-        .cat-btn.active, .cat-btn:hover { background: #0f3460; color: white; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
-        .card-body { padding: 16px; }
-        .card h3 { font-size: 17px; color: #1a1a2e; margin-bottom: 6px; }
-        .card .desc { color: #666; font-size: 13px; min-height: 36px; line-height: 1.4; }
-        .card .cat-tag { display: inline-block; background: #e8eaf6; color: #0f3460; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; margin: 8px 0; }
-        .card .preco { font-size: 22px; font-weight: 700; color: #0a7a2f; margin: 8px 0; }
-        .card .btn-add { width: 100%; padding: 11px; border: none; border-radius: 10px; background: #0f3460; color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .card .btn-add:hover { background: #1a1a2e; }
-        .card .qty-controls { display: flex; align-items: center; gap: 12px; justify-content: center; margin-bottom: 8px; }
-        .card .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #0f3460; background: white; color: #0f3460; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .card .qty-btn:hover { background: #0f3460; color: white; }
-        .card .qty-val { font-size: 18px; font-weight: 600; min-width: 20px; text-align: center; }
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0f3460; color: white; padding: 14px 20px; display: none; z-index: 200; box-shadow: 0 -4px 20px rgba(0,0,0,0.2); }
-        .cart-bar-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .cart-bar .cart-total { font-size: 18px; font-weight: 700; }
-        .cart-bar .btn-enviar { background: #27ae60; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .cart-bar .btn-enviar:hover { background: #219a52; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; }
-        .modal-overlay.show { display: flex; }
-        .modal { background: white; border-radius: 16px; padding: 30px; width: 90%; max-width: 400px; }
-        .modal h2 { margin-bottom: 16px; color: #1a1a2e; }
-        .modal .form-group { margin-bottom: 14px; }
-        .modal .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        .modal .form-group input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px; }
-        .modal .btn-row { display: flex; gap: 10px; }
-        .modal .btn-row button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
-        .btn-cancel { background: #eee; color: #333; }
-        .btn-confirm { background: #27ae60; color: white; }
-        .vazio { background: white; padding: 30px; border-radius: 14px; color: #666; text-align: center; font-size: 16px; }
-        .obs-input { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; margin-top: 6px; }
-    </style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cardapio Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
-    <div class="topo">
-        <div class="topo-inner">
-            <h1>Cardápio Digital</h1>
-            <div class="mesa-badge">Mesa <span th:text="${mesa.numero}">1</span> - <span th:text="${mesa.area}">Salão</span></div>
-        </div>
-    </div>
+    <div class="app-layout">
+        <div th:replace="~{fragments/sidebar :: sidebar('cardapio')}"></div>
 
-    <div class="container" style="padding-bottom: 100px;">
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Buscar produto..." oninput="filterProducts()">
-        </div>
+        <div class="app-content">
+            <div th:replace="~{fragments/header :: header('Cardapio Digital')}"></div>
 
-        <div class="categorias">
-            <button class="cat-btn active" onclick="filterByCategory(null, this)">Todos</button>
-            <span th:each="produto : ${itensCardapio}">
-                <!-- categories will be extracted by JS -->
-            </span>
-        </div>
-
-        <div th:if="${#lists.isEmpty(itensCardapio)}" class="vazio">
-            Nenhum produto disponível no momento.
-        </div>
-
-        <div id="gridProdutos" class="grid">
-            <div class="card" th:each="produto : ${itensCardapio}"
-                 th:data-nome="${produto.nome}" th:data-categoria="${produto.categoria}"
-                 th:data-id="${produto.id}" th:data-preco="${produto.preco}">
-                <div class="card-body">
-                    <h3 th:text="${produto.nome}">Produto</h3>
-                    <p class="desc" th:text="${produto.descricao}">Descrição</p>
-                    <span class="cat-tag" th:text="${produto.categoria}">Categoria</span>
-                    <div class="preco">R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}">0.00</span></div>
-                    <div class="qty-controls">
-                        <button class="qty-btn" onclick="changeQty(this, -1)">-</button>
-                        <span class="qty-val">0</span>
-                        <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+            <div class="content-wrapper" style="padding-bottom: 100px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="background: var(--accent-light); color: var(--accent-color); padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                            Mesa <span th:text="${mesa.numero}">1</span> - <span th:text="${mesa.area}">Salao</span>
+                        </span>
                     </div>
-                    <input class="obs-input" type="text" placeholder="Observações (ex: sem cebola)">
-                    <button class="btn-add" onclick="addToCart(this)">Adicionar ao Pedido</button>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Buscar produto..." oninput="filterProducts()"/>
+                </div>
+
+                <div class="categorias">
+                    <button class="cat-btn active" onclick="filterByCategory(null, this)">Todos</button>
+                </div>
+
+                <div th:if="${#lists.isEmpty(itensCardapio)}" class="vazio">
+                    Nenhum produto disponivel no momento.
+                </div>
+
+                <div id="gridProdutos" class="product-grid">
+                    <div class="product-card" th:each="produto : ${itensCardapio}"
+                         th:data-nome="${produto.nome}" th:data-categoria="${produto.categoria}"
+                         th:data-id="${produto.id}" th:data-preco="${produto.preco}">
+                        <div class="card-body">
+                            <h3 th:text="${produto.nome}">Produto</h3>
+                            <p class="desc" th:text="${produto.descricao}">Descricao</p>
+                            <span class="cat-tag" th:text="${produto.categoria}">Categoria</span>
+                            <div class="preco">R$ <span th:text="${#numbers.formatDecimal(produto.preco, 1, 2)}">0.00</span></div>
+                            <div class="qty-controls">
+                                <button class="qty-btn" onclick="changeQty(this, -1)">-</button>
+                                <span class="qty-val">0</span>
+                                <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                            </div>
+                            <input class="obs-input" type="text" placeholder="Observacoes (ex: sem cebola)"/>
+                            <button class="btn-add" onclick="addToCart(this)">Adicionar ao Pedido</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Cart Bar -->
     <div class="cart-bar" id="cartBar">
         <div class="cart-bar-inner">
             <div>
@@ -106,15 +68,16 @@
         </div>
     </div>
 
+    <!-- Confirm Modal -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal">
             <h2>Confirmar Pedido</h2>
             <p>Mesa: <strong th:text="${mesa.numero}">1</strong> - <span th:text="${mesa.nome}">Mesa 1</span></p>
             <div id="cartSummary" style="margin: 16px 0; max-height: 200px; overflow-y: auto;"></div>
-            <p style="font-size:18px; font-weight:700; color:#0a7a2f; margin:10px 0;">Total: R$ <span id="modalTotal">0.00</span></p>
+            <p style="font-size:18px; font-weight:700; color:var(--green); margin:10px 0;">Total: R$ <span id="modalTotal">0.00</span></p>
             <div class="form-group">
                 <label>Senha para confirmar</label>
-                <input type="password" id="confirmSenha" placeholder="Sua senha">
+                <input type="password" id="confirmSenha" placeholder="Sua senha"/>
             </div>
             <div class="btn-row">
                 <button class="btn-cancel" onclick="hideConfirmModal()">Cancelar</button>
@@ -123,18 +86,19 @@
         </div>
     </div>
 
+    <script th:src="@{/js/app.js}"></script>
     <script th:inline="javascript">
-        const mesaId = [[${mesa.id}]];
-        const empresaId = [[${mesa.empresa.id}]];
-        let cart = [];
+        var mesaId = [[${mesa.id}]];
+        var empresaId = [[${mesa.empresa.id}]];
+        var cart = [];
 
         // Extract unique categories and render category buttons
-        const cards = document.querySelectorAll('.card');
-        const cats = new Set();
-        cards.forEach(c => cats.add(c.dataset.categoria));
-        const catContainer = document.querySelector('.categorias');
-        cats.forEach(cat => {
-            const btn = document.createElement('button');
+        var cards = document.querySelectorAll('.product-card');
+        var cats = new Set();
+        cards.forEach(function(c) { cats.add(c.dataset.categoria); });
+        var catContainer = document.querySelector('.categorias');
+        cats.forEach(function(cat) {
+            var btn = document.createElement('button');
             btn.className = 'cat-btn';
             btn.textContent = cat;
             btn.onclick = function() { filterByCategory(cat, this); };
@@ -142,36 +106,36 @@
         });
 
         function filterByCategory(cat, btn) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
-            cards.forEach(card => {
+            cards.forEach(function(card) {
                 card.style.display = (!cat || card.dataset.categoria === cat) ? '' : 'none';
             });
         }
 
         function filterProducts() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            cards.forEach(card => {
-                const name = card.dataset.nome.toLowerCase();
+            var q = document.getElementById('searchInput').value.toLowerCase();
+            cards.forEach(function(card) {
+                var name = card.dataset.nome.toLowerCase();
                 card.style.display = name.includes(q) ? '' : 'none';
             });
         }
 
         function changeQty(btn, delta) {
-            const container = btn.closest('.qty-controls');
-            const valEl = container.querySelector('.qty-val');
-            let val = parseInt(valEl.textContent) + delta;
+            var container = btn.closest('.qty-controls');
+            var valEl = container.querySelector('.qty-val');
+            var val = parseInt(valEl.textContent) + delta;
             if (val < 0) val = 0;
             valEl.textContent = val;
         }
 
         function addToCart(btn) {
-            const card = btn.closest('.card');
-            const qty = parseInt(card.querySelector('.qty-val').textContent);
+            var card = btn.closest('.product-card');
+            var qty = parseInt(card.querySelector('.qty-val').textContent);
             if (qty <= 0) return;
 
-            const obs = card.querySelector('.obs-input').value;
-            const item = {
+            var obs = card.querySelector('.obs-input').value;
+            var item = {
                 produtoId: parseInt(card.dataset.id),
                 nome: card.dataset.nome,
                 preco: parseFloat(card.dataset.preco),
@@ -180,7 +144,7 @@
                 adicionais: []
             };
 
-            const existing = cart.find(c => c.produtoId === item.produtoId);
+            var existing = cart.find(function(c) { return c.produtoId === item.produtoId; });
             if (existing) {
                 existing.quantidade += qty;
                 existing.observacao = obs || existing.observacao;
@@ -191,12 +155,13 @@
             card.querySelector('.qty-val').textContent = '0';
             card.querySelector('.obs-input').value = '';
             updateCartBar();
+            showToast(qty + 'x ' + item.nome + ' adicionado ao pedido');
         }
 
         function updateCartBar() {
-            const bar = document.getElementById('cartBar');
-            const totalItems = cart.reduce((s, i) => s + i.quantidade, 0);
-            const totalPrice = cart.reduce((s, i) => s + (i.preco * i.quantidade), 0);
+            var bar = document.getElementById('cartBar');
+            var totalItems = cart.reduce(function(s, i) { return s + i.quantidade; }, 0);
+            var totalPrice = cart.reduce(function(s, i) { return s + (i.preco * i.quantidade); }, 0);
 
             document.getElementById('cartCount').textContent = totalItems;
             document.getElementById('cartTotal').textContent = totalPrice.toFixed(2);
@@ -204,11 +169,14 @@
         }
 
         function showConfirmModal() {
-            const summary = document.getElementById('cartSummary');
-            summary.innerHTML = cart.map(i =>
-                `<div style="padding:4px 0;border-bottom:1px solid #eee;">${i.quantidade}x ${i.nome} - R$ ${(i.preco * i.quantidade).toFixed(2)}${i.observacao ? '<br><small style="color:#888;">Obs: ' + i.observacao + '</small>' : ''}</div>`
-            ).join('');
-            document.getElementById('modalTotal').textContent = cart.reduce((s, i) => s + (i.preco * i.quantidade), 0).toFixed(2);
+            var summary = document.getElementById('cartSummary');
+            summary.innerHTML = cart.map(function(i) {
+                var html = '<div style="padding:4px 0;border-bottom:1px solid var(--border-color);">' + i.quantidade + 'x ' + i.nome + ' - R$ ' + (i.preco * i.quantidade).toFixed(2);
+                if (i.observacao) { html += '<br><small style="color:var(--text-muted);">Obs: ' + i.observacao + '</small>'; }
+                html += '</div>';
+                return html;
+            }).join('');
+            document.getElementById('modalTotal').textContent = cart.reduce(function(s, i) { return s + (i.preco * i.quantidade); }, 0).toFixed(2);
             document.getElementById('confirmModal').classList.add('show');
         }
 
@@ -217,23 +185,24 @@
         }
 
         function enviarPedido() {
-            const senha = document.getElementById('confirmSenha').value;
+            var senha = document.getElementById('confirmSenha').value;
             if (!senha) { alert('Informe sua senha para confirmar'); return; }
 
-            // First verify password via login
-            const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+            var usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
 
-            const pedido = {
+            var pedido = {
                 empresaId: empresaId,
                 mesaId: mesaId,
                 usuarioId: usuario.id || null,
                 garcomId: null,
-                itens: cart.map(i => ({
-                    produtoId: i.produtoId,
-                    quantidade: i.quantidade,
-                    observacao: i.observacao,
-                    adicionais: i.adicionais
-                }))
+                itens: cart.map(function(i) {
+                    return {
+                        produtoId: i.produtoId,
+                        quantidade: i.quantidade,
+                        observacao: i.observacao,
+                        adicionais: i.adicionais
+                    };
+                })
             };
 
             fetch('/api/pedidos', {
@@ -241,8 +210,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(pedido)
             })
-            .then(r => r.json())
-            .then(data => {
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
                 if (data.erro) {
                     alert('Erro: ' + data.erro);
                 } else {
@@ -252,7 +221,7 @@
                     window.location.href = '/pedido/acompanhar/' + data.id;
                 }
             })
-            .catch(() => alert('Erro de conexão'));
+            .catch(function() { alert('Erro de conexao'); });
         }
     </script>
 </body>

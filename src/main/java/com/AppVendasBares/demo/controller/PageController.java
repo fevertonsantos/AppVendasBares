@@ -84,8 +84,18 @@ public class PageController {
     public String comandaPage(@PathVariable Long mesaId, Model model) {
         Mesa mesa = mesaService.buscarPorId(mesaId);
         List<PedidoResponse> pedidos = pedidoService.listarPorMesa(mesaId);
+        java.math.BigDecimal grandTotal = pedidos.stream()
+                .map(PedidoResponse::total)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
         model.addAttribute("mesa", mesa);
         model.addAttribute("pedidos", pedidos);
+        model.addAttribute("grandTotal", grandTotal);
         return "views/comanda";
+    }
+
+    @GetMapping("/admin/selecionar-empresa")
+    public String selecionarEmpresaPage(Model model) {
+        model.addAttribute("empresas", empresaRepository.findAll());
+        return "views/selecionar-empresa";
     }
 }

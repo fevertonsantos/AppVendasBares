@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside id="sidebar" class="sidebar" th:fragment="sidebar(activePage)">
+    <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
+
+    <div class="sidebar-brand">
+        <div class="brand-icon">&#127860;</div>
+        <div>
+            <div class="brand-text">AppVendasBares</div>
+            <div class="brand-sub">Sistema de Vendas</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <!-- SECTION: Principal -->
+        <div class="nav-section">Principal</div>
+        <ul style="list-style:none; padding:0;">
+            <!-- Dashboard - DONO, MASTER -->
+            <li class="nav-item" th:if="${perfil == 'DONO' or perfil == 'MASTER'}">
+                <a class="nav-link" th:href="'/admin/dashboard/' + ${empresaId}"
+                   th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                    <span class="nav-icon">&#128202;</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Acompanhar Pedido - ALL -->
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="toggleSubmenu(event)"
+                   th:classappend="${activePage == 'acompanhar'} ? 'expanded' : ''">
+                    <span class="nav-icon">&#128203;</span>
+                    <span class="nav-text">Acompanhar Pedido</span>
+                    <span class="arrow">&#9654;</span>
+                </a>
+                <ul class="submenu" th:classappend="${activePage == 'acompanhar'} ? 'open' : ''">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="'/comanda/' + ${mesaId}">
+                            <span class="nav-text">Meus Pedidos</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- SECTION: Cardapio -->
+        <div class="nav-section">Cardapio</div>
+        <ul style="list-style:none; padding:0;">
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="toggleSubmenu(event)"
+                   th:classappend="${activePage == 'cardapio'} ? 'expanded' : ''">
+                    <span class="nav-icon">&#127869;</span>
+                    <span class="nav-text">Cardapio</span>
+                    <span class="arrow">&#9654;</span>
+                </a>
+                <ul class="submenu" th:classappend="${activePage == 'cardapio'} ? 'open' : ''">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="'/cardapio/' + ${mesaId}">
+                            <span class="nav-text">Ver Cardapio</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- SECTION: Comanda -->
+        <div class="nav-section" th:if="${perfil == 'DONO' or perfil == 'MASTER' or perfil == 'GARCOM'}">Comanda</div>
+        <ul style="list-style:none; padding:0;" th:if="${perfil == 'DONO' or perfil == 'MASTER' or perfil == 'GARCOM'}">
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="toggleSubmenu(event)"
+                   th:classappend="${activePage == 'comanda'} ? 'expanded' : ''">
+                    <span class="nav-icon">&#128196;</span>
+                    <span class="nav-text">Comanda</span>
+                    <span class="arrow">&#9654;</span>
+                </a>
+                <ul class="submenu" th:classappend="${activePage == 'comanda'} ? 'open' : ''">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="'/comanda/' + ${mesaId}">
+                            <span class="nav-text">Meus Pedidos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${perfil == 'DONO' or perfil == 'MASTER'}">
+                        <a class="nav-link" th:href="'/admin/dashboard/' + ${empresaId}">
+                            <span class="nav-text">Ger. de Mesa</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- SECTION: Producao - DONO, MASTER, GARCOM, PRODUCAO -->
+        <div class="nav-section" th:if="${perfil == 'DONO' or perfil == 'MASTER' or perfil == 'GARCOM' or perfil == 'PRODUCAO'}">Producao</div>
+        <ul style="list-style:none; padding:0;" th:if="${perfil == 'DONO' or perfil == 'MASTER' or perfil == 'GARCOM' or perfil == 'PRODUCAO'}">
+            <li class="nav-item">
+                <a class="nav-link" th:href="'/cozinha/' + ${empresaId}"
+                   th:classappend="${activePage == 'cozinha'} ? 'active' : ''">
+                    <span class="nav-icon">&#127859;</span>
+                    <span class="nav-text">Painel de Producao</span>
+                </a>
+            </li>
+        </ul>
+
+        <!-- SECTION: Administracao - DONO, MASTER -->
+        <div class="nav-section" th:if="${perfil == 'DONO' or perfil == 'MASTER'}">Administracao</div>
+        <ul style="list-style:none; padding:0;" th:if="${perfil == 'DONO' or perfil == 'MASTER'}">
+            <li class="nav-item">
+                <a class="nav-link" th:href="'/admin/dashboard/' + ${empresaId}"
+                   th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+                    <span class="nav-icon">&#128200;</span>
+                    <span class="nav-text">Relatorios</span>
+                </a>
+            </li>
+            <li class="nav-item" th:if="${perfil == 'MASTER'}">
+                <a class="nav-link" th:href="'/admin/selecionar-empresa'"
+                   th:classappend="${activePage == 'selecionar'} ? 'active' : ''">
+                    <span class="nav-icon">&#127970;</span>
+                    <span class="nav-text">Estabelecimentos</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar footer -->
+    <div style="padding: 16px 20px; border-top: 1px solid var(--border-color);">
+        <a class="nav-link" href="#" onclick="doLogout()" style="padding: 8px 0;">
+            <span class="nav-icon">&#128682;</span>
+            <span class="nav-text">Sair</span>
+        </a>
+    </div>
+</aside>
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+</body>
+</html>
