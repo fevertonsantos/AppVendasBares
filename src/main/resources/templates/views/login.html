@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AppVendasBares</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-container { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { font-size: 28px; color: #1a1a2e; }
+        .logo p { color: #666; margin-top: 5px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; transition: border-color 0.3s; }
+        .form-group input:focus { outline: none; border-color: #0f3460; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: #0f3460; color: white; }
+        .btn-primary:hover { background: #1a1a2e; }
+        .links { text-align: center; margin-top: 20px; }
+        .links a { color: #0f3460; text-decoration: none; font-size: 14px; }
+        .links a:hover { text-decoration: underline; }
+        .error-msg { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+        .success-msg { background: #efe; color: #060; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>AppVendasBares</h1>
+            <p>Sistema de Vendas para Bares e Restaurantes</p>
+        </div>
+
+        <div id="errorMsg" class="error-msg"></div>
+        <div id="successMsg" class="success-msg"></div>
+
+        <form id="loginForm" onsubmit="return doLogin(event)">
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" required placeholder="Sua senha">
+            </div>
+            <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+
+        <div class="links">
+            <p><a href="/registrar">Criar conta</a></p>
+            <p style="margin-top:8px;"><a href="#" onclick="showRecuperarSenha()">Esqueci minha senha</a></p>
+        </div>
+
+        <div id="recuperarForm" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid #eee;">
+            <div class="form-group">
+                <label for="emailRecuperar">E-mail para recuperação</label>
+                <input type="email" id="emailRecuperar" placeholder="seu@email.com">
+            </div>
+            <button class="btn btn-primary" onclick="doRecuperarSenha()">Enviar senha temporária</button>
+        </div>
+    </div>
+
+    <script>
+        function doLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.erro) {
+                    showError(data.erro);
+                } else {
+                    localStorage.setItem('usuario', JSON.stringify(data));
+                    if (data.perfil === 'DONO' || data.perfil === 'MASTER') {
+                        window.location.href = '/admin/dashboard/' + data.empresaId;
+                    } else if (data.perfil === 'PRODUCAO') {
+                        window.location.href = '/cozinha/' + data.empresaId;
+                    } else if (data.perfil === 'GARCOM') {
+                        window.location.href = '/cozinha/' + data.empresaId;
+                    } else {
+                        window.location.href = '/cardapio/1';
+                    }
+                }
+            })
+            .catch(err => showError('Erro de conexão'));
+            return false;
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showRecuperarSenha() {
+            document.getElementById('recuperarForm').style.display = 'block';
+        }
+
+        function doRecuperarSenha() {
+            const email = document.getElementById('emailRecuperar').value;
+            if (!email) { showError('Informe o e-mail'); return; }
+
+            fetch('/api/auth/recuperar-senha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.erro) showError(data.erro);
+                else showSuccess(data.mensagem);
+            })
+            .catch(err => showError('Erro de conexão'));
+        }
+    </script>
+</body>
+</html>

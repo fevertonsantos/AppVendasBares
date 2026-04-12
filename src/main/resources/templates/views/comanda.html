@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comanda da Mesa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+        .topo { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; padding: 16px 20px; text-align: center; }
+        .container { max-width: 700px; margin: 20px auto; padding: 0 20px; }
+        .mesa-header { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; text-align: center; }
+        .mesa-header h2 { color: #1a1a2e; }
+        .mesa-header .badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px; }
+        .badge-ocupada { background: #fff3cd; color: #856404; }
+        .badge-livre { background: #d4edda; color: #155724; }
+        .pedido-section { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 12px; }
+        .pedido-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+        .pedido-header h3 { color: #1a1a2e; font-size: 16px; }
+        .status-badge { padding: 3px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+        .status-RECEBIDO, .status-EM_FILA { background: #fff3cd; color: #856404; }
+        .status-EM_PREPARO { background: #cce5ff; color: #004085; }
+        .status-PRONTO { background: #d4edda; color: #155724; }
+        .status-ENTREGUE { background: #e2e3e5; color: #383d41; }
+        .status-FECHADO { background: #d1ecf1; color: #0c5460; }
+        .item-line { padding: 6px 0; display: flex; justify-content: space-between; font-size: 14px; }
+        .item-line .name { color: #333; }
+        .item-line .price { color: #0a7a2f; font-weight: 600; }
+        .pedido-total { text-align: right; font-size: 16px; font-weight: 700; color: #0a7a2f; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
+        .grand-total { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center; margin-bottom: 16px; }
+        .grand-total .value { font-size: 28px; font-weight: 700; color: #0a7a2f; }
+        .grand-total .label { color: #888; font-size: 14px; }
+        .btn-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; display: block; }
+        .btn-cardapio { background: #0f3460; color: white; }
+        .btn-fechar { background: #e74c3c; color: white; }
+        .empty { text-align: center; color: #888; padding: 40px; }
+    </style>
+</head>
+<body>
+    <div class="topo"><h1>Comanda da Mesa</h1></div>
+
+    <div class="container">
+        <div class="mesa-header">
+            <h2>Mesa <span th:text="${mesa.numero}">1</span> - <span th:text="${mesa.nome}">Mesa 1</span></h2>
+            <p th:text="${mesa.area}">Salão</p>
+            <span class="badge" th:classappend="'badge-' + ${mesa.status.name().toLowerCase()}" th:text="${mesa.status}">LIVRE</span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(pedidos)}" class="empty">Nenhum pedido registrado para esta mesa.</div>
+
+        <div class="grand-total" th:if="${!#lists.isEmpty(pedidos)}">
+            <div class="label">Total da Mesa</div>
+            <div class="value">R$ <span id="grandTotal">0.00</span></div>
+        </div>
+
+        <div th:each="pedido : ${pedidos}" class="pedido-section">
+            <div class="pedido-header">
+                <h3>Pedido #<span th:text="${pedido.id}">1</span></h3>
+                <span class="status-badge" th:classappend="'status-' + ${pedido.status}" th:text="${pedido.status}">RECEBIDO</span>
+            </div>
+            <div th:each="item : ${pedido.itens}" class="item-line">
+                <span class="name"><span th:text="${item.quantidade}">1</span>x <span th:text="${item.produtoNome}">Produto</span></span>
+                <span class="price">R$ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">0.00</span></span>
+            </div>
+            <div class="pedido-total">Subtotal: R$ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span></div>
+        </div>
+
+        <div class="btn-row" th:if="${!#lists.isEmpty(pedidos)}">
+            <a th:href="'/cardapio/' + ${mesa.id}" class="btn btn-cardapio">Novo Pedido</a>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const pedidos = [[${pedidos}]];
+        const total = pedidos.reduce((s, p) => s + p.total, 0);
+        document.getElementById('grandTotal').textContent = total.toFixed(2);
+    </script>
+</body>
+</html>
