@@ -109,6 +109,10 @@ public class AuthController {
         if (usuarioId == null) {
             return ResponseEntity.status(401).body(Map.of("erro", "Não autenticado"));
         }
+        String perfil = (String) session.getAttribute("perfil");
+        if (!"MASTER".equals(perfil)) {
+            return ResponseEntity.status(403).body(Map.of("erro", "Acesso negado"));
+        }
         session.setAttribute("empresaId", empresaId);
         return ResponseEntity.ok(Map.of("mensagem", "Empresa selecionada", "empresaId", empresaId));
     }
