@@ -50,7 +50,7 @@
                     <div th:if="${!#lists.isEmpty(pedidos)}" class="grand-total-card">
                         <div class="label">Total da Comanda</div>
                         <div class="value">R$ <span id="grandTotal"
-                            th:text="${#numbers.formatDecimal(pedidos.stream().map(p -> p.total()).reduce(T(java.math.BigDecimal).ZERO, (a,b) -> a.add(b)), 1, 2)}">0.00</span></div>
+                            th:text="${#numbers.formatDecimal(grandTotal, 1, 2)}">0.00</span></div>
                     </div>
                 </div>
             </div>
