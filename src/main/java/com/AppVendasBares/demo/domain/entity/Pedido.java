@@ -2,8 +2,6 @@ package com.AppVendasBares.demo.domain.entity;
 
 import com.AppVendasBares.demo.domain.enums.StatusPedido;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,8 +10,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "pedido")
-@Getter
-@Setter
 public class Pedido {
 
     @Id
@@ -51,4 +47,37 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoItem> itens = new ArrayList<>();
+
+    public Pedido() {
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Empresa getEmpresa() { return empresa; }
+    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
+
+    public Mesa getMesa() { return mesa; }
+    public void setMesa(Mesa mesa) { this.mesa = mesa; }
+
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+
+    public Usuario getGarcom() { return garcom; }
+    public void setGarcom(Usuario garcom) { this.garcom = garcom; }
+
+    public StatusPedido getStatus() { return status; }
+    public void setStatus(StatusPedido status) { this.status = status; }
+
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
+
+    public Integer getTempoEstimado() { return tempoEstimado; }
+    public void setTempoEstimado(Integer tempoEstimado) { this.tempoEstimado = tempoEstimado; }
+
+    public LocalDateTime getCriadoEm() { return criadoEm; }
+    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
+
+    public List<PedidoItem> getItens() { return itens; }
+    public void setItens(List<PedidoItem> itens) { this.itens = itens; }
 }

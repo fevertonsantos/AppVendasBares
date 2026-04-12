@@ -2,15 +2,11 @@ package com.AppVendasBares.demo.domain.entity;
 
 import com.AppVendasBares.demo.domain.enums.SetorProducao;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "produto")
-@Getter
-@Setter
 public class Produto {
 
     @Id
@@ -46,4 +42,37 @@ public class Produto {
 
     @Column(nullable = false)
     private Boolean ativo = true;
+
+    public Produto() {
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Empresa getEmpresa() { return empresa; }
+    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
+
+    public CategoriaProduto getCategoria() { return categoria; }
+    public void setCategoria(CategoriaProduto categoria) { this.categoria = categoria; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
+
+    public BigDecimal getPreco() { return preco; }
+    public void setPreco(BigDecimal preco) { this.preco = preco; }
+
+    public String getFoto() { return foto; }
+    public void setFoto(String foto) { this.foto = foto; }
+
+    public SetorProducao getSetorProducao() { return setorProducao; }
+    public void setSetorProducao(SetorProducao setorProducao) { this.setorProducao = setorProducao; }
+
+    public Integer getEstoque() { return estoque; }
+    public void setEstoque(Integer estoque) { this.estoque = estoque; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 }

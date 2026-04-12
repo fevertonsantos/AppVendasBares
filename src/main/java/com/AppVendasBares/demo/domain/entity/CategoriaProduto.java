@@ -1,13 +1,9 @@
 package com.AppVendasBares.demo.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "categoria_produto")
-@Getter
-@Setter
 public class CategoriaProduto {
 
     @Id
@@ -26,4 +22,22 @@ public class CategoriaProduto {
 
     @Column(nullable = false)
     private Boolean ativo = true;
+
+    public CategoriaProduto() {
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Empresa getEmpresa() { return empresa; }
+    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public Integer getOrdem() { return ordem; }
+    public void setOrdem(Integer ordem) { this.ordem = ordem; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 }
