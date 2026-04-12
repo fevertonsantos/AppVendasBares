@@ -78,6 +78,16 @@ public class PedidoController {
         }
     }
 
+    @PutMapping("/mesa/{mesaId}/fechar")
+    public ResponseEntity<?> fecharComandaPorMesa(@PathVariable Long mesaId) {
+        try {
+            List<PedidoResponse> responses = pedidoService.fecharComandaPorMesa(mesaId);
+            return ResponseEntity.ok(Map.of("mensagem", "Comanda fechada", "pedidos", responses));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));
+        }
+    }
+
     @GetMapping("/fila/{empresaId}/{setor}")
     public List<PedidoItemResponse> listarFila(@PathVariable Long empresaId,
                                                 @PathVariable String setor) {

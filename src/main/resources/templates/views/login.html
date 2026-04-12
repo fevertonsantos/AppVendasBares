@@ -139,6 +139,7 @@
                 // Redirect based on profile
                 var perfil = result.data.perfil;
                 var empresaId = result.data.empresaId;
+                var mesaId = result.data.mesaId || 1;
                 if (perfil === 'MASTER') {
                     window.location.href = '/admin/selecionar-empresa';
                 } else if (perfil === 'DONO') {
@@ -148,7 +149,7 @@
                 } else if (perfil === 'GARCOM') {
                     window.location.href = '/admin/dashboard/' + empresaId;
                 } else {
-                    window.location.href = '/cardapio/1';
+                    window.location.href = '/cardapio/' + mesaId;
                 }
             })
             .catch(function() {

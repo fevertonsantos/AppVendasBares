@@ -185,6 +185,36 @@ public class PedidoService {
         return response;
     }
 
+    @Transactional
+    public List<PedidoResponse> fecharComandaPorMesa(Long mesaId) {
+        List<Pedido> pedidosMesa = pedidoRepository.findByMesaIdOrderByCriadoEmDesc(mesaId);
+        if (pedidosMesa.isEmpty()) {
+            throw new IllegalArgumentException("Nenhum pedido encontrado para esta mesa");
+        }
+
+        List<PedidoResponse> responses = new java.util.ArrayList<>();
+        for (Pedido pedido : pedidosMesa) {
+            if (pedido.getStatus() != StatusPedido.FECHADO && pedido.getStatus() != StatusPedido.CANCELADO) {
+                pedido.setStatus(StatusPedido.FECHADO);
+                pedidoRepository.save(pedido);
+                responses.add(toResponse(pedido));
+            }
+        }
+
+        // Free the mesa
+        Mesa mesa = mesaRepository.findById(mesaId)
+                .orElseThrow(() -> new IllegalArgumentException("Mesa não encontrada"));
+        mesa.setStatus(StatusMesa.LIVRE);
+        mesaRepository.save(mesa);
+
+        Long empresaId = mesa.getEmpresa().getId();
+        for (PedidoResponse resp : responses) {
+            messagingTemplate.convertAndSend("/topic/pedidos/" + empresaId, resp);
+        }
+
+        return responses;
+    }
+
     public List<PedidoResponse> listarPorEmpresa(Long empresaId) {
         return pedidoRepository.findByEmpresaIdOrderByCriadoEmDesc(empresaId)
                 .stream()

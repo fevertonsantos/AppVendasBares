@@ -35,7 +35,7 @@
                 </a>
                 <ul class="submenu" th:classappend="${activePage == 'acompanhar'} ? 'open' : ''">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="'/comanda/1'">
+                        <a class="nav-link" th:href="'/comanda/' + ${mesaId}">
                             <span class="nav-text">Meus Pedidos</span>
                         </a>
                     </li>
@@ -55,7 +55,7 @@
                 </a>
                 <ul class="submenu" th:classappend="${activePage == 'cardapio'} ? 'open' : ''">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="'/cardapio/1'">
+                        <a class="nav-link" th:href="'/cardapio/' + ${mesaId}">
                             <span class="nav-text">Ver Cardapio</span>
                         </a>
                     </li>
@@ -75,7 +75,7 @@
                 </a>
                 <ul class="submenu" th:classappend="${activePage == 'comanda'} ? 'open' : ''">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="'/comanda/1'">
+                        <a class="nav-link" th:href="'/comanda/' + ${mesaId}">
                             <span class="nav-text">Meus Pedidos</span>
                         </a>
                     </li>

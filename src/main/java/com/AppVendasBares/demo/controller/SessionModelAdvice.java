@@ -13,9 +13,11 @@ public class SessionModelAdvice {
         Object perfil = session.getAttribute("perfil");
         Object empresaId = session.getAttribute("empresaId");
         Object nomeUsuario = session.getAttribute("nomeUsuario");
+        Object mesaId = session.getAttribute("mesaId");
 
         model.addAttribute("perfil", perfil != null ? perfil.toString() : "CLIENTE");
         model.addAttribute("empresaId", empresaId != null ? empresaId : 1L);
         model.addAttribute("nomeUsuario", nomeUsuario != null ? nomeUsuario.toString() : null);
+        model.addAttribute("mesaId", mesaId != null ? mesaId : 1L);
     }
 }
