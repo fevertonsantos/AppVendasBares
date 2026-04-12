@@ -95,5 +95,5 @@ INSERT INTO mesa (empresa_id, numero, nome, area, setor, andar, tipo_mesa, qtd_c
 -- Admin user (password: Admin@123)
 INSERT INTO usuario (empresa_id, nome, cpf, email, telefone, senha_hash, perfil, ativo)
 VALUES (1, 'Administrador', '000.000.000-00', 'admin@bardodemo.com', '11999999999',
-        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'DONO', true)
+        '$2a$10$iPN2RE7KxTsjnl1jAwgTmeAKfmUz7HqTyMfWEbyCFkwbR84KIroYK', 'DONO', true)
 ON CONFLICT (email) DO NOTHING;
