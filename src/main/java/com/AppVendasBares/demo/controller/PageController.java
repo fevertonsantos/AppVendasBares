@@ -66,9 +66,18 @@ public class PageController {
         return "views/cozinha";
     }
 
+    @GetMapping("/admin/master/select")
+    public String masterSelectPage(Model model, HttpSession session) {
+        model.addAttribute("pageTitle", "Seleção Master");
+        model.addAttribute("empresas", empresaRepository.findAll());
+        return "views/master-select";
+    }
+
     @GetMapping("/admin/dashboard/{empresaId}")
-    public String dashboardPage(@PathVariable Long empresaId, Model model) {
+    public String dashboardPage(@PathVariable Long empresaId, Model model, HttpSession session) {
+        session.setAttribute("empresaId", empresaId);
         model.addAttribute("empresaId", empresaId);
+        model.addAttribute("pageTitle", "Dashboard");
         model.addAttribute("dashboard", dashboardService.getDashboard(empresaId));
         return "views/dashboard";
     }
